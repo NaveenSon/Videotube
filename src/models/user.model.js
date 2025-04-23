@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema(
 //so we have to use normal function instead of arrow function.
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next(); //here ismodified is asviable in this function
-  this.password = bcryp.hash(this.password, 10);
+  this.password = await bcryp.hash(this.password, 10);
   next();
 });
 
@@ -96,8 +96,8 @@ userSchema.methods.generateRefreshToken = function () {
         }
       );
 };
-const User = mongoose.model("User", userSchema);
+export const User = mongoose.model("User", userSchema);
 
-export default User;
+
 
 //jwt is bearer token like a key if u have this token   then u can access this data
