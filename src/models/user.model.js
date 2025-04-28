@@ -57,17 +57,16 @@ const userSchema = new mongoose.Schema(
 //so we have to use normal function instead of arrow function.
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next(); //here ismodified is asviable in this function
-  this.password = await bcryp.hash(this.password, 10);
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
 //we cna make custom methods
 userSchema.methods.isPasswordCorrect = async function (password) {
-  if (password) {
+    if (!password) return false;
     return await bcrypt.compare(password, this.password);
-  }
-};
-
+  };
+  
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
@@ -76,9 +75,9 @@ userSchema.methods.generateAccessToken = function () {
       username: this.username,
       fullName: this.fullName,
     },
-    procees.env.ACCESS_TOKEN_SECRET,
+    process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: procees.env.ACCESS_TOKEN_EXPIRY,
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
     }
   );
   // Token generation logic here
@@ -90,14 +89,14 @@ userSchema.methods.generateRefreshToken = function () {
           _id: this._id,
          
         },
-        procees.env.REFRESH_TOKEN_SECRET,
+        process.env.REFRESH_TOKEN_SECRET,
         {
-          expiresIn: procees.env.REFRESH_TOKEN_EXPIRY,
+          expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
         }
       );
 };
-export const User = mongoose.model("User", userSchema);
+ const User = mongoose.model("User", userSchema);
 
-
+export {User}
 
 //jwt is bearer token like a key if u have this token   then u can access this data
